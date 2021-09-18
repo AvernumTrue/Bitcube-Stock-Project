@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Levels</title>
+    <link rel="stylesheet" href="assets/general.css">
+</head>
+
+<body>
+    <h1>Stock Levels</h1>
+
+    <ul>
+        <% for(let product of products) { %>
+            <li>
+                <%= product.name %>
+                    <ul>
+                        <li>Price: $<%= product.price%>
+                        </li>
+                        <li>Quantity: <%= product.quantity%>
+                        </li>
+                    </ul>
+            </li>
+            <form action="/products/<%=product._id%>?_method=PUT" method="POST">
+                <lable for="addProductCode">Select a Product Code</label>
+                    <select id="addProductCode" required name="addProductCode">
+                        <option value="">--Select--</option>
+                        <% for(let product of products) { %>
+                            <option value="<%product._id%>">
+                                <%=product.name%>
+                            </option>
+                            <% }%>
+                    </select>
+                    <label for="price">Price:</label>
+                    <input type="number" id="price" name="price" placeholder="price" min="1" step="0.01" min="0.01"
+                        required>
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" name="quantity" required placeholder="quantity">
+                    <button>Add Stock</button>
+            </form>
+            <% }%>
+    </ul>
+
+    <a href="/products/new">New Product</a>
+
+</body>
+
+</html>
