@@ -3,6 +3,7 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override')
+const Emails = require('./models/emails');
 const Product = require('./models/product');
 const helpers = require('./helpers');
 
@@ -35,7 +36,7 @@ app.patch('/products', async (req, res, next) => {
         const { _id } = req.body;
 
         if (req.body.price == null) throw new Error('Must include a price');
-        if (req.body.quantity == null) throw new Error('Must include a price');
+        if (req.body.quantity == null) throw new Error('Must include a quantity');
 
         const existingProduct = await Product.findById(_id);
         if (existingProduct == null) throw new Error(`Unable to update product ${_id}. \nProduct does not exist`);
@@ -48,18 +49,22 @@ app.patch('/products', async (req, res, next) => {
     }
 })
 
+app.post('/products', async (req, res, next) => {
+    try {
+        const newProduct = new Product(req.body);
+        await newProduct.save();
+        res.redirect(`/products`)
+    } catch (err) {
+        next(err);
+    }
+})
+
 app.get('/products/new', (req, res, next) => {
     try {
         res.render('products/new', {})
     } catch (err) {
         next(err);
     }
-})
-
-app.put('/products', async (req, res) => {
-    const newProduct = new Product(req.body);
-    await newProduct.save();
-    res.redirect(`/products/one/${newProduct._id}`)
 })
 
 app.get('/products/one/:id', async (req, res) => {
@@ -80,9 +85,9 @@ app.patch('/products/one/:id', async (req, res) => {
     res.redirect(`/products/${product._id}`);
 })
 
-app.delete('/products/one/:id', async (req, res) => {
+app.delete('/products/:id', async (req, res) => {
     const { id } = req.params;
-    const deletedProduct = await Product.findByIdAndDelete(id);
+    await Product.findByIdAndDelete(id);
     res.redirect('/products');
 })
 
