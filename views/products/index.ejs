@@ -4,48 +4,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Levels</title>
-    <link rel="stylesheet" href="assets/general.css">
+    <title>Stock App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
 </head>
 
 <body>
-    <h1>Stock Levels</h1>
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-half is-offset-one-quarter">
+                    <div class="block">
+                        <h1 class="panel-heading">
+                            <p class="title is-1">
+                                Stock App
+                            </p>
+                        </h1>
+                    </div>
+                    <div class="box">
+                        <h2 class="panel-heading">
+                            <p class="title is-3">
+                                Stock Levels
+                            </p>
+                        </h2>
+                        <ul>
+                            <% for(let product of products) { %>
+                                <div class="block">
+                                    <li>
+                                        <h3 class="panel-heading">
+                                            <p class="title is-4">
+                                                <%= product.name %>
+                                            </p>
+                                        </h3>
+                                        <div class="box">
+                                            <ul>
+                                                <li>Price: R<%= product.price%>
+                                                </li>
+                                                <li>Quantity: <%= product.quantity%>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <form action="/products/<%=product._id%>?_method=DELETE" method="POST">
+                                        <button class="button is-danger">Delete</button>
+                                    </form>
+                                </div>
+                                <% }%>
+                        </ul>
+                    </div>
+                    <h2 class="panel-heading">
+                        <p class="title is-3">
+                            Add Stock
+                        </p>
+                    </h2>
+                    <div class="box">
+                        <form action="/products?_method=PATCH" method="post">
+                            <label for="_id">Select a Product Code:</label>
+                            <br>
+                            <div class="select">
+                                <select required name="_id">
+                                    <option value="">--Select--</option>
+                                    <% for(let product of products) { %>
+                                        <option value="<%=product._id%>">
+                                            <%=product.name%>
+                                        </option>
+                                        <% }%>
+                                </select>
+                            </div>
+                            <br>
+                            <label for="price">Price per item Received:</label>
+                            <input class="input" type="number" name="Price" placeholder="Price" min="0" step="0.01"
+                                min="0.01" required>
+                            <br>
+                            <label for="quantity">Items Received:</label>
+                            <input class="input" type="number" name="quantity" required placeholder="Quantity" min="1">
+                            <br>
+                            <button class="button is-link">Add Stock</button>
+                        </form>
+                    </div>
+                    <h2 class="panel-heading">
+                        <p class="title is-3">
+                            Remove Stock
+                        </p>
+                    </h2>
+                    <div class="box">
+                        <form action="" method="">
+                            <label for="_id">Select a Product Code:</label>
+                            <br>
+                            <div class="select">
+                                <select required name="_id">
+                                    <option value="">--Select--</option>
+                                    <% for(let product of products) { %>
+                                        <option value="<%=product._id%>">
+                                            <%=product.name%>
+                                        </option>
+                                        <% }%>
+                                </select>
+                            </div>
+                            <br>
+                            <label for="email">Buyer Email Address:</label>
+                            <input class="input" type="email" name="email" placeholder="Email" required>
+                            <br>
+                            <label for="quantity">Items Bought:</label>
+                            <input class="input" type="number" name="quantity" required placeholder="Quantity" min="1">
+                            <br>
+                            <button class="button is-link">Remove Stock</button>
+                        </form>
+                    </div>
+                    <a class="button is-success" href="/products/new">New Product</a>
+                </div>
+            </div>
+        </div>
 
-    <ul>
-        <% for(let product of products) { %>
-            <li>
-                <%= product.name %>
-                    <ul>
-                        <li>Price: R<%= product.price%>
-                        </li>
-                        <li>Quantity: <%= product.quantity%>
-                        </li>
-                    </ul>
-            </li>
-            <form action="/products/<%=product._id%>?_method=DELETE" method="POST">
-                <button>Delete</button>
-            </form>
-            <% }%>
-    </ul>
-
-    <form action="/products?_method=PATCH" method="post">
-        <label for="_id">Select a Product Code</label>
-        <select required name="_id">
-            <option value="">--Select--</option>
-            <% for(let product of products) { %>
-                <option value="<%=product._id%>">
-                    <%=product.name%>
-                </option>
-                <% }%>
-        </select>
-        <label for="price">Price:</label>
-        <input type="number" name="price" placeholder="price" min="0" step="0.01" min="0.01" required>
-        <label for="quantity">Quantity</label>
-        <input type="number" name="quantity" required placeholder="quantity" min="1">
-        <button>Add Stock</button>
-    </form>
-
-    <a href="/products/new">New Product</a>
+    </section>
 
 </body>
 
