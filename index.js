@@ -6,6 +6,7 @@ const methodOverride = require('method-override')
 const Email = require('./models/email');
 const Product = require('./models/product');
 const helpers = require('./helpers');
+const seedProducts = require('./seedProducts')
 
 mongoose.connect('mongodb://localhost:27017/stockManager', {
     useNewUrlParser: true,
@@ -28,6 +29,10 @@ app.use(methodOverride('_method'));
 app.get('/products', async (req, res) => {
     const products = await Product.find({});
     const error = req.query.error;
+    console.log(products);
+    if (products == 0) {
+        Product.insertMany(seedProducts)
+    }
     res.render('products/index', { products, error });
 })
 
@@ -53,7 +58,6 @@ app.patch('/products', async (req, res, next) => {
 app.post('/products/remove', async (req, res, next) => {
     try {
         const email = req.body.email;
-
         const matchingEmails = await Email.find({ email });
         console.log(`Matching Emails`, matchingEmails);
         if (matchingEmails.length > 0) {
@@ -65,12 +69,10 @@ app.post('/products/remove', async (req, res, next) => {
         });
         console.log(`New Email`, email);
         await newEmail.save();
-
         const { _id } = req.body;
         const existingQuantity = await Product.findById(_id);
         req.body.quantity = existingQuantity.quantity - req.body.quantity
         await Product.findByIdAndUpdate(_id, req.body);
-
         res.redirect('/products');
     } catch (err) {
         next(err);
