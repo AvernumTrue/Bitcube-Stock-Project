@@ -11,9 +11,6 @@ const helpers = {
             quantity: totalQuantity,
         };
     },
-    findTotalProducts: (newProducts, oldProducts) => {
-        return newProducts + oldProducts
-    },
 };
 
 module.exports = helpers;

@@ -23,7 +23,7 @@ mongoose.connect('mongodb://localhost:27017/stockManager', {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride('_method'))
+app.use(methodOverride('_method'));
 
 app.get('/products', async (req, res) => {
     const products = await Product.find({});
@@ -43,7 +43,7 @@ app.patch('/products', async (req, res, next) => {
         if (existingProduct == null) throw new Error(`Unable to update product ${_id}. \nProduct does not exist`);
 
         const mergedProduct = helpers.addStockToProduct(existingProduct, Number(req.body.price), Number(req.body.quantity));
-        const product = await Product.findByIdAndUpdate(_id, mergedProduct, { runValidators: true, new: true });
+        await Product.findByIdAndUpdate(_id, mergedProduct, { runValidators: true, new: true });
         res.redirect('/products');
     } catch (err) {
         next(err);
@@ -56,26 +56,21 @@ app.post('/products/remove', async (req, res, next) => {
 
         const matchingEmails = await Email.find({ email });
         console.log(`Matching Emails`, matchingEmails);
-
         if (matchingEmails.length > 0) {
-            const ErrorMessage = `This email (${email}) has already removed a product`;
+            const ErrorMessage = `This email address: (${email}) has already removed a product, please use a different email address.`;
             return res.redirect(`/products?error=${encodeURIComponent(ErrorMessage)}`);
         }
-
         const newEmail = new Email({
             email,
         });
         console.log(`New Email`, email);
         await newEmail.save();
 
-        // for (let matchingEmail of matchingEmails) {
-        //     if (email == matchingEmail) {
-        //         res.redirect('/products');
-        //     } else {
-        //         const newEmail = new Email(req.body)
-        //         newEmail.save();
-        //     }
-        // }
+        const { _id } = req.body;
+        const existingQuantity = await Product.findById(_id);
+        req.body.quantity = existingQuantity.quantity - req.body.quantity
+        await Product.findByIdAndUpdate(_id, req.body);
+
         res.redirect('/products');
     } catch (err) {
         next(err);
