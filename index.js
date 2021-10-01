@@ -29,7 +29,6 @@ app.use(methodOverride('_method'));
 app.get('/products', async (req, res) => {
     const products = await Product.find({});
     const error = req.query.error;
-    console.log(products);
     if (products == 0) {
         Product.insertMany(seedProducts)
     }
@@ -39,14 +38,7 @@ app.get('/products', async (req, res) => {
 app.patch('/products', async (req, res, next) => {
     try {
         const { _id } = req.body;
-
-        if (req.body.price == null) throw new Error('Must include a price');
-        if (req.body.quantity == null) throw new Error('Must include a quantity');
-
         const existingProduct = await Product.findById(_id);
-
-        if (existingProduct == null) throw new Error(`Unable to update product ${_id}. \nProduct does not exist`);
-
         const mergedProduct = helpers.addStockToProduct(existingProduct, Number(req.body.price), Number(req.body.quantity));
         await Product.findByIdAndUpdate(_id, mergedProduct, { runValidators: true, new: true });
         res.redirect('/products');
@@ -61,8 +53,8 @@ app.post('/products/remove', async (req, res, next) => {
         const matchingEmails = await Email.find({ email });
         console.log(`Matching Emails`, matchingEmails);
         if (matchingEmails.length > 0) {
-            const ErrorMessage = `This email address: (${email}) has already removed a product, please use a different email address.`;
-            return res.redirect(`/products?error=${encodeURIComponent(ErrorMessage)}`);
+            const errorMessage = `This email address: (${email}) has already removed a product, please use a different email address.`;
+            return res.redirect(`/products?error=${errorMessage}`);
         }
         const newEmail = new Email({
             email,
